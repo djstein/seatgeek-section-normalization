@@ -42,4 +42,16 @@ The normalize function has many parts that run for the section and row supplied 
   - Second, check if there is only one value in split_string and only one value was returned via the regular expression match
   - Third, if the split string is multiple values (typically a name of a section with a number attached) change each value of array to it's scrubbed component
 
-- Now that the section name and row name have been cleaned, begin looking for the corresponding key in the dictionary.
+- Now that the section name and row name have been cleaned, begin looking for the corresponding key in the dictionary. The key examined is then lowered and split. Immediately if the section name and key are the same, set the keyv (key value variable) to the key and break. Begin then exaimining if the split_key has parts contained in the split_section. When all values are found regardless of order the function sets the keyv to key and breaks. [Lines 99-109]
+- Finally once the keyv is set, it attempts to find the cleaned row name within the section name dictionary. Once found, the section_id, row_id, and valid are set. [Lines 112-118]
+
+# !!! Improvements !!!
+I personally found that under a time constraint it was going to be too extremely complicated to determine any and all edge cases supplied in the dodgertest.csv. Many section names supplied included integers with characters attached and these characters had no 100% corrolation with a particular section name in the mainfest_data. While I was able to achieve splitting of the integers and string, it would create an extremely high time complexity within Lines 75-89 by checking against the split key's data value's first characters.
+I believe there are two solutions to ensure this time complexity is lowered for abbreviations and exceptionally long section names:
+1. When users enter data to the csv, that data is not included unless it is first cleaned via strong form validation or API validation
+2. Applying the use of a learning database. Coupling each venue's csv file manifest with a second csv or xml set that has a compiled list of common terms and their abbrevations. When an abbreviation is found that is not understood by the normalize it can either check in these steps:
+  - Determining if each letter (in a int/string pair) is found within the section name key (will return many results however)
+  - Stop progress on the in use thread and prompt the user to input what an abbreviation means, rechecking keys and adding the value to the database
+  - OR while higher complexity, when a new abbreviation is found it can attempt to check each section name's dictionary to determine if the row name is found. This may return multiple results, but the key name can then be weighted with the abbreviation after the fact and added to the database as an association.
+  
+This solution would be needed to determine values such as the dodgertest.csv line 998, 44FD,E,212,4,True. The 44FD is supposed to correspond to 212,Field Box 44,4,E (line 3203 on dogerstadium_sections.csv). However FD does not relate to the Field Box string extremely efficiently, it could also fit to Right Field Pavilion, etc.
