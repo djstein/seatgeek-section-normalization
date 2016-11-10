@@ -47,25 +47,23 @@ class Normalizer(object):
             row {[type]} -- [description]
         """
         
-        # check if section is in self.manifest_data before looking for partial of section
-        # make a regular expression that splits apart all portions of the section, then test for keys and if all parts of a key are found return that key
-        
-        # instantiate values for scope
+        # Instantiated values for scope
         section_id = None
         keyv = None
         row_id = None
         valid = False
 
-        # compile regular expressions
+        # Compile regular expressions
         reg_int = re.compile('\d+')
         reg_string = re.compile('([a-zA-Z]+)')
         reg_int_string = re.compile("([0-9]+)([a-zA-Z]+)")
 
-        # lower the section text
+        # Lower the section text
         section = section.lower()
         split_section = section.split(" ")
 
         # Check if row only has one instance of integers
+        # Clean the integer if it contains a leading 0
         int_search = reg_int.findall(row)
         if int_search and len(int_search) > 1:
             return(section_id, row_id, valid)
@@ -83,15 +81,14 @@ class Normalizer(object):
                 reg_search = reg_string.match(val)
 
             if reg_search and len(split_section) == 1 and reg_search.groups():
-                split_section = str(reg_search.groups())
+                # split_section = str(reg_search.groups())
+                split_section = [x for x in list(reg_search.groups()) ]
                 break
             elif reg_search and len(split_section) == 1 and reg_search.group():
                 split_section = [str(reg_search.group())]
+                break
             elif reg_search:
                 split_section[i] = str(reg_search.group())
-
-        print split_section
-        print row
 
         for key in self.manifest_data.keys():
             lower_key = key.lower()
@@ -120,11 +117,4 @@ class Normalizer(object):
                 row_id = int(self.manifest_data[str(keyv)][str(row)])
                 valid = True
 
-        print "{} {} {}".format(section_id, row_id, valid)
-        print "------------------------------------"
         return(section_id, row_id, valid)
-
-#  time python genericgrader.py --manifest manifests/citifield_sections.csv --input samples/metstest.csv --lang python --verbose
-# time python genericgrader.py --manifest manifests/dodgerstadium_sections.csv --input samples/dodgertest.csv --lang python --verbose
-# ./python/normalize --manifest ../manifests/dodgerstadium_sections.csv --input ../samples/dodgertest.csv
-# ./python/normalize --manifest ../manifests/citifield_sections.csv --input ../samples/metstest.csv
