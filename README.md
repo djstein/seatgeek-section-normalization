@@ -1,6 +1,8 @@
 # seatgeek_section_normalization
 Normalize the naming conventions applied by the various sellers and map the listings to a *canonical* list of sections and rows that we know to actually exist in the stadium.
 
+[GITHUB LINK](https://github.com/djstein/seatgeek_section_normalization/blob/master/README.md)
+
 # Explination of Normalizer
 
 ## Dictionary: manifest_data
